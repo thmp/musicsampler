@@ -1,5 +1,6 @@
 package cdtm.sampler;
 
+import cdtm.HttpUpdateThread;
 import com.jsyn.data.FloatSample;
 import com.jsyn.ports.QueueDataCommand;
 import com.jsyn.unitgen.VariableRateStereoReader;
@@ -30,5 +31,6 @@ public class UpdateCommand implements ScheduledCommand {
         }
 
         SamplePlayers.getInstance().synth.scheduleCommand(currentTime + duration, new UpdateCommand());
+
     }
 }

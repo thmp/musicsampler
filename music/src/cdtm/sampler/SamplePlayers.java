@@ -1,5 +1,6 @@
 package cdtm.sampler;
 
+import cdtm.HttpUpdateThread;
 import com.jsyn.JSyn;
 import com.jsyn.Synthesizer;
 import com.jsyn.unitgen.LineOut;
@@ -25,7 +26,7 @@ public class SamplePlayers {
 
         try {
             synth = JSyn.createSynthesizer();
-            synth.getAudioDeviceManager().setSuggestedOutputLatency( 0.50 );
+            synth.getAudioDeviceManager().setSuggestedOutputLatency( 0.33 );
             lineOut = new LineOut();
             synth.add(lineOut);
 
@@ -48,6 +49,9 @@ public class SamplePlayers {
         lineOut.start();
 
         synth.queueCommand(new UpdateCommand());
+
+        // update the configuration
+        (new HttpUpdateThread()).start();
     }
 
     public void stop() {
