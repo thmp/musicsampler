@@ -1,4 +1,4 @@
-package de.cdtm.sampler;
+package cdtm.sampler;
 
 import com.jsyn.JSyn;
 import com.jsyn.Synthesizer;
@@ -15,7 +15,7 @@ public class SamplePlayers {
         return ourInstance;
     }
 
-    public boolean[] active = new boolean[]{false, false, true, false, false, false, false, false};
+    public boolean[] active = new boolean[]{true, true, true, false, true, false, false, false};
     public Vector<VariableRateStereoReader> samplePlayers = new Vector<VariableRateStereoReader>();
 
     public Synthesizer synth;

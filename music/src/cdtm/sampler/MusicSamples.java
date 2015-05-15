@@ -1,4 +1,4 @@
-package de.cdtm.sampler;
+package cdtm.sampler;
 
 import com.jsyn.data.FloatSample;
 import com.jsyn.util.SampleLoader;

@@ -1,10 +1,12 @@
-package de.cdtm;
+package cdtm;
 
-import de.cdtm.adc.ADCReader;
-import de.cdtm.adc.MCP3008Reader;
-import de.cdtm.sampler.SamplePlayers;
+import adc.ADCReader;
+import adc.MCP3008Reader;
+import cdtm.sampler.SamplePlayers;
 
 import javax.swing.*;
+
+import static spark.Spark.*;
 
 // To play sound using Clip, the process need to be alive.
 // Hence, we use a Swing application.
@@ -32,5 +34,7 @@ public class MusicSampler extends JFrame {
     public static void main(String[] args) {
         MusicSampler musicSampler = new MusicSampler();
         musicSampler.start();
+
+        get("/sensors", (req, res) -> "Test" );
     }
 }

@@ -1,4 +1,4 @@
-package de.cdtm.adc;
+package adc;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
@@ -7,23 +7,22 @@ import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
-import de.cdtm.MusicSampler;
-import de.cdtm.sampler.MusicSamples;
-import de.cdtm.sampler.SamplePlayers;
 
 import javax.swing.*;
+
+import static spark.Spark.get;
 
 /**
  * Read an Analog to Digital Converter
  */
-public class ADCReader extends JFrame
+public class ADCReader
 {
 
     public ADCReader() {
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        /*this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setTitle("Test Sound Clip");
         this.setSize(300, 200);
-        this.setVisible(true);
+        this.setVisible(true);*/
     }
 
     private final static boolean DISPLAY_DIGIT = false;
@@ -65,15 +64,19 @@ public class ADCReader extends JFrame
     private static GpioPinDigitalOutput clockOutput      = null;
     private static GpioPinDigitalOutput chipSelectOutput = null;
 
+    private static int volume = 0;
+
     private static boolean go = true;
 
     public void start()
     {
-        SamplePlayers.getInstance().start();
+
     }
 
     public static void main(String[] args)
     {
+
+        get("/sensors", (req, res) -> volume );
 
         ADCReader reader = new ADCReader();
         reader.start();
@@ -98,35 +101,34 @@ public class ADCReader extends JFrame
         while (go)
         {
             boolean trimPotChanged = false;
-            int adc = readAdc();
+            int adc = readAdc(MCP3008_input_channels.CH0.ch());
             int postAdjust = Math.abs(adc - lastRead);
             if (postAdjust > tolerance)
             {
                 trimPotChanged = true;
-                int volume = (int)(adc / 10.23); // [0, 1023] ~ [0x0000, 0x03FF] ~ [0&0, 0&1111111111]
+                volume = 100 - (int)(adc / 10.23); // [0, 1023] ~ [0x0000, 0x03FF] ~ [0&0, 0&1111111111]
                 if (DEBUG)
                     System.out.println("readAdc:" + Integer.toString(adc) +
                             " (0x" + lpad(Integer.toString(adc, 16).toUpperCase(), "0", 2) +
                             ", 0&" + lpad(Integer.toString(adc, 2), "0", 8) + ")");
                 System.out.println("Volume:" + volume + "% (" + adc + ")");
                 lastRead = adc;
-
-                SamplePlayers.getInstance().active[4] = volume < 50;
             }
-            try { Thread.sleep(500L); } catch (InterruptedException ie) { ie.printStackTrace(); }
+            try { Thread.sleep(10L); } catch (InterruptedException ie) { ie.printStackTrace(); }
         }
         System.out.println("Bye...");
         gpio.shutdown();
     }
 
-    private static int readAdc()
+    private static int readAdc(int channel)
     {
         chipSelectOutput.high();
 
         clockOutput.low();
         chipSelectOutput.low();
 
-        int adccommand = ADC_CHANNEL;
+        //int adccommand = ADC_CHANNEL;
+        int adccommand = channel;
         adccommand |= 0x18; // 0x18: 00011000
         adccommand <<= 3;
         // Send 5 bits: 8 - 3. 8 input channels on the MCP3008.
