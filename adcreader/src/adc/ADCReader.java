@@ -8,7 +8,7 @@ import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 
-import javax.swing.*;
+import java.util.Arrays;
 
 import static spark.Spark.get;
 
@@ -64,7 +64,7 @@ public class ADCReader
     private static GpioPinDigitalOutput clockOutput      = null;
     private static GpioPinDigitalOutput chipSelectOutput = null;
 
-    private static int volume = 0;
+    private static int[] volume = new int[] {0, 0, 0, 0, 0, 0, 0, 0};
 
     private static boolean go = true;
 
@@ -76,7 +76,7 @@ public class ADCReader
     public static void main(String[] args)
     {
 
-        get("/sensors", (req, res) -> volume );
+        get("/sensors", (req, res) -> Arrays.toString(volume) );
 
         ADCReader reader = new ADCReader();
         reader.start();
@@ -96,23 +96,48 @@ public class ADCReader
                 go = false;
             }
         });
-        int lastRead  = 0;
+        int[] lastRead  = new int[] {0, 0, 0, 0, 0, 0, 0, 0};
         int tolerance = 5;
         while (go)
         {
-            boolean trimPotChanged = false;
-            int adc = readAdc(MCP3008_input_channels.CH0.ch());
-            int postAdjust = Math.abs(adc - lastRead);
-            if (postAdjust > tolerance)
-            {
-                trimPotChanged = true;
-                volume = 100 - (int)(adc / 10.23); // [0, 1023] ~ [0x0000, 0x03FF] ~ [0&0, 0&1111111111]
-                if (DEBUG)
-                    System.out.println("readAdc:" + Integer.toString(adc) +
-                            " (0x" + lpad(Integer.toString(adc, 16).toUpperCase(), "0", 2) +
-                            ", 0&" + lpad(Integer.toString(adc, 2), "0", 8) + ")");
-                System.out.println("Volume:" + volume + "% (" + adc + ")");
-                lastRead = adc;
+            for (int i = 0; i < lastRead.length; i++) {
+                int adc = 0;
+                switch(i) {
+                    case 0:
+                        adc = readAdc(MCP3008_input_channels.CH0.ch());
+                        break;
+                    case 1:
+                        adc = readAdc(MCP3008_input_channels.CH1.ch());
+                        break;
+                    case 2:
+                        adc = readAdc(MCP3008_input_channels.CH2.ch());
+                        break;
+                    case 3:
+                        adc = readAdc(MCP3008_input_channels.CH3.ch());
+                        break;
+                    case 4:
+                        adc = readAdc(MCP3008_input_channels.CH4.ch());
+                        break;
+                    case 5:
+                        adc = readAdc(MCP3008_input_channels.CH5.ch());
+                        break;
+                    case 6:
+                        adc = readAdc(MCP3008_input_channels.CH6.ch());
+                        break;
+                    case 7:
+                        adc = readAdc(MCP3008_input_channels.CH7.ch());
+                        break;
+                }
+                int postAdjust = Math.abs(adc - lastRead[i]);
+                if (postAdjust > tolerance) {
+                    volume[i] = 100 - (int) (adc / 10.23); // [0, 1023] ~ [0x0000, 0x03FF] ~ [0&0, 0&1111111111]
+                    if (DEBUG)
+                        System.out.println("readAdc:" + Integer.toString(adc) +
+                                " (0x" + lpad(Integer.toString(adc, 16).toUpperCase(), "0", 2) +
+                                ", 0&" + lpad(Integer.toString(adc, 2), "0", 8) + ")");
+                    System.out.println("Channel "+i+":" + volume[i] + "% (" + adc + ")");
+                    lastRead[i] = adc;
+                }
             }
             try { Thread.sleep(10L); } catch (InterruptedException ie) { ie.printStackTrace(); }
         }

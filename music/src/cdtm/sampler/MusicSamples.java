@@ -21,12 +21,12 @@ public class MusicSamples {
         String[] files = new String[]{
                 "Bass Addon.wav",
                 "Bass.wav",
-                "Drums Full.wav",
                 "Drums Simple.wav",
+                "Drums Full.wav",
                 "Organ.wav",
-                "Wind.wav",
-                "beat1.wav",
-                "beat1.wav"
+                "Vocals Art People.wav",
+                "Vocals Makes Smile.wav",
+                "Wind.wav"
             };
 
         for (int i = 0; i < files.length; i++) {

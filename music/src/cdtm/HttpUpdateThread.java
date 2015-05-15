@@ -11,9 +11,18 @@ import java.util.concurrent.TimeUnit;
 
 public class HttpUpdateThread extends Thread {
 
+    private static int[] fromString(String string) {
+        String[] strings = string.replace("[", "").replace("]", "").split(", ");
+        int result[] = new int[strings.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = Integer.parseInt(strings[i]);
+        }
+        return result;
+    }
+
     @Override
     public void run() {
-        System.out.println("HTTP update");
+        //System.out.println("HTTP update");
 
         String url = "http://192.168.0.104:4567/sensors";
         try {
@@ -42,14 +51,17 @@ public class HttpUpdateThread extends Thread {
             in.close();
 
             //print result
-            //System.out.println(response.toString());
+            System.out.println(response.toString());
 
-            int volume = Integer.parseInt(response.toString());
-            SamplePlayers.getInstance().active[4] = volume > 50;
+            int[] volume = fromString(response.toString());
+
+            for (int i = 0; i < 8; i++) {
+                SamplePlayers.getInstance().active[i] = volume[i] > 50;
+            }
 
 
             final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-            executor.schedule(new HttpUpdateThread(), 1, TimeUnit.SECONDS);
+            executor.schedule(new HttpUpdateThread(), 250, TimeUnit.MILLISECONDS);
 
         } catch(Exception e) {
 
