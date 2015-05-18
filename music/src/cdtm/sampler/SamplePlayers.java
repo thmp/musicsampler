@@ -3,7 +3,9 @@ package cdtm.sampler;
 import cdtm.HttpUpdateThread;
 import com.jsyn.JSyn;
 import com.jsyn.Synthesizer;
+import com.jsyn.data.SegmentedEnvelope;
 import com.jsyn.unitgen.LineOut;
+import com.jsyn.unitgen.VariableRateMonoReader;
 import com.jsyn.unitgen.VariableRateStereoReader;
 
 import java.util.Vector;
@@ -18,7 +20,8 @@ public class SamplePlayers {
 
     public boolean[] active = new boolean[]{true, true, true, false, true, false, false, false};
     public int[] volume = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
-    public Vector<VariableRateStereoReader> samplePlayers = new Vector<VariableRateStereoReader>();
+    public Vector<VariableRateStereoReader> samplePlayers = new Vector<>();
+    public Vector<VariableRateMonoReader> envPlayers = new Vector<>();
 
     public Synthesizer synth;
     public LineOut lineOut;
@@ -37,6 +40,11 @@ public class SamplePlayers {
                 samplePlayers.get(i).output.connect(0, lineOut.input, 0);
                 samplePlayers.get(i).output.connect(1, lineOut.input, 1);
                 samplePlayers.get(i).rate.set(MusicSamples.getInstance().samples.get(i).getFrameRate());
+
+                envPlayers.add(new VariableRateMonoReader());
+                synth.add(envPlayers.get(i));
+                envPlayers.get(i).output.connect(samplePlayers.get(i).amplitude);
+                envPlayers.get(i).start();
                 //samplePlayers.get(i).rate.set();
             }
 
@@ -50,6 +58,7 @@ public class SamplePlayers {
         lineOut.start();
 
         synth.queueCommand(new UpdateCommand());
+        synth.queueCommand(new UpdateVolumeCommand());
 
         // update the configuration
         (new HttpUpdateThread()).start();

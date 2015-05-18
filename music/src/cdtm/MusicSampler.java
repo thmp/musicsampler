@@ -8,10 +8,15 @@ import cdtm.sampler.SamplePlayers;
 public class MusicSampler extends PApplet{
 	private static final long serialVersionUID = 1L;
 	int[] colors = {0xfffffad6, 0xfffed34f, 0xffda9e35, 0xffbd4832};
-	
+
+    public static boolean started = false;
+
     public void start()
     {
-        SamplePlayers.getInstance().start();
+        if (!started) {
+            SamplePlayers.getInstance().start();
+        }
+        started = true;
     }
 
     public void stop() {

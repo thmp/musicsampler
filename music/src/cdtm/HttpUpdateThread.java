@@ -51,7 +51,7 @@ public class HttpUpdateThread extends Thread {
             in.close();
 
             //print result
-            System.out.println(response.toString());
+            //System.out.println(response.toString());
 
             int[] volume = fromString(response.toString());
 
