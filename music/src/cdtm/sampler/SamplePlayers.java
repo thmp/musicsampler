@@ -17,6 +17,7 @@ public class SamplePlayers {
     }
 
     public boolean[] active = new boolean[]{true, true, true, false, true, false, false, false};
+    public int[] volume = new int[]{0, 0, 0, 0, 0, 0, 0, 0};
     public Vector<VariableRateStereoReader> samplePlayers = new Vector<VariableRateStereoReader>();
 
     public Synthesizer synth;
@@ -58,4 +59,11 @@ public class SamplePlayers {
         synth.stop();
     }
 
+    public void setVolume(int[] volume) {
+    	this.volume = volume;
+    	
+    	for(int i = 0; i < volume.length; i++) {
+    		active[i] = volume[i] > 50;
+    	}
+    }
 }

@@ -55,10 +55,7 @@ public class HttpUpdateThread extends Thread {
 
             int[] volume = fromString(response.toString());
 
-            for (int i = 0; i < 8; i++) {
-                SamplePlayers.getInstance().active[i] = volume[i] > 50;
-            }
-
+            SamplePlayers.getInstance().setVolume(volume);
 
             final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
             executor.schedule(new HttpUpdateThread(), 250, TimeUnit.MILLISECONDS);
