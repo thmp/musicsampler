@@ -58,7 +58,7 @@ public class HttpUpdateThread extends Thread {
             SamplePlayers.getInstance().setVolume(volume);
 
             final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-            executor.schedule(new HttpUpdateThread(), 50, TimeUnit.MILLISECONDS);
+            executor.schedule(new HttpUpdateThread(), 100, TimeUnit.MILLISECONDS);
 
         } catch(Exception e) {
 
